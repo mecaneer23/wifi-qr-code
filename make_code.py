@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Generate a qrcode to share the current wifi name and password"""
 
+try:
+    from qrcode.main import QRCode
+
+    QRCODE_EXISTS = True
+except ModuleNotFoundError:
+    QRCODE_EXISTS = False  # pyright: ignore[reportConstantRedefinition]
+
+
 def get_ssid() -> str:
     """Fetch the current wifi ssid"""
     raise NotImplementedError()
@@ -16,9 +24,15 @@ def create_wifi_string(ssid: str, password: str) -> str:
     return f"WIFI:T:WPA;S:{ssid};P:{password};;"
 
 
-def print_qrcode(string: str) -> None:
+def print_qrcode(data: str) -> None:
     """Print a qrcode holding `string`"""
-    raise NotImplementedError()
+    if not QRCODE_EXISTS:
+        print("`qrcode` not installed: run `pip install qrcode`")
+        return
+    qr = QRCode()
+    qr.add_data(data)
+    qr.make(fit=True)
+    qr.print_ascii(invert=True)
 
 
 def main() -> None:
